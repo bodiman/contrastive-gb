@@ -139,7 +139,7 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         **DecisionTreeRegressor._parameter_constraints,
         "learning_rate": [Interval(Real, 0.0, None, closed="left")],
         "n_estimators": [Interval(Integral, 1, None, closed="left")],
-        "criterion": [StrOptions({"friedman_mse", "squared_error"})],
+        "criterion": [StrOptions({"friedman_mse", "squared_error", "contrastive"})],
         "subsample": [Interval(Real, 0.0, 1.0, closed="right")],
         "verbose": ["verbose"],
         "warm_start": ["boolean"],
@@ -427,6 +427,7 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         self : object
             Fitted estimator.
         """
+
         self._validate_params()
 
         if not self.warm_start:
@@ -435,7 +436,8 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         # Check input
         # Since check_array converts both X and y to the same dtype, but the
         # trees use different types for X and y, checking them separately.
-
+        
+        
         X, y = self._validate_data(
             X, y, accept_sparse=["csr", "csc", "coo"], dtype=DTYPE, multi_output=True
         )
@@ -477,17 +479,24 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         else:
             X_val = y_val = sample_weight_val = None
 
-        if not self._is_initialized():
+        #Actual fitting starts here
+
+        if not self._is_initialized(): #if length of estimators <= 0
             # init state
-            self._init_state()
+            self._init_state() #irrelevant to loss
 
             # fit initial model and initialize raw predictions
-            if self.init_ == "zero":
+            if self.init_ == "contrastive":
+                raw_predictions = np.zeros(
+                    shape=(X.shape[0], self._loss.latent_dim), dtype=np.float64
+                )
+            elif self.init_ == "zero":
                 raw_predictions = np.zeros(
                     shape=(X.shape[0], self._loss.K), dtype=np.float64
                 )
             else:
                 # XXX clean this once we have a support_sample_weight tag
+                #change this for contrastive loss
                 if sample_weight_is_none:
                     self.init_.fit(X, y)
                 else:
@@ -524,7 +533,7 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         else:
             # add more estimators to fitted model
             # invariant: warm_start = True
-            if self.n_estimators < self.estimators_.shape[0]:
+            if self.n_estimators < self.estimators_.shape[0]: #Ignore, just an assertion
                 raise ValueError(
                     "n_estimators=%d must be larger or equal to "
                     "estimators_.shape[0]=%d when "
@@ -609,6 +618,7 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
             # the addition of each successive stage
             y_val_pred_iter = self._staged_raw_predict(X_val, check_input=False)
 
+        #everything above this is just weird checks for weird cases
         # perform boosting iterations
         i = begin_at_stage
         for i in range(begin_at_stage, self.n_estimators):
@@ -1198,7 +1208,7 @@ class GradientBoostingClassifier(ClassifierMixin, BaseGradientBoosting):
     _parameter_constraints: dict = {
         **BaseGradientBoosting._parameter_constraints,
         "loss": [
-            StrOptions({"log_loss", "deviance", "exponential"}, deprecated={"deviance"})
+            StrOptions({"log_loss", "deviance", "exponential", "contrastive"}, deprecated={"deviance"})
         ],
         "init": [StrOptions({"zero"}), None, HasMethods(["fit", "predict_proba"])],
     }
@@ -1757,9 +1767,9 @@ class GradientBoostingRegressor(RegressorMixin, BaseGradientBoosting):
     0.4...
     """
 
-    _parameter_constraints: dict = {
+    _parameter_constraints: dict = { #come back here
         **BaseGradientBoosting._parameter_constraints,
-        "loss": [StrOptions({"squared_error", "absolute_error", "huber", "quantile"})],
+        "loss": [StrOptions({"squared_error", "absolute_error", "huber", "quantile", "contrastive"})],
         "init": [StrOptions({"zero"}), None, HasMethods(["fit", "predict"])],
         "alpha": [Interval(Real, 0.0, 1.0, closed="neither")],
     }

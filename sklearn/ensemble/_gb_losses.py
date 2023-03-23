@@ -191,6 +191,8 @@ class RegressionLossFunction(LossFunction, metaclass=ABCMeta):
             )
 
     def get_init_raw_predictions(self, X, estimator):
+        assert estimator != "contrastive", "predict cannot be called with a contrastive loss function"
+
         predictions = estimator.predict(X)
         return predictions.reshape(-1, 1).astype(np.float64)
 
@@ -987,6 +989,184 @@ class ExponentialLoss(ClassificationLossFunction):
         return raw_predictions.reshape(-1, 1).astype(np.float64)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class ContrastiveLossFunction(RegressionLossFunction):
+    def __init__(self, latent_dim=4):
+        super().__init__()
+        self.latent_dim = latent_dim
+
+    def init_estimator(self):
+        return "contrastive"
+
+    def single_point_loss(self, vec1, vec2, shared, margin=1):
+        if shared:
+            return np.linalg.norm(np.array(vec1 - vec2), ord=2)
+        
+        return max(0, margin - np.linalg.norm(np.array(vec1 - vec2), ord=2))
+    
+    def single_point_grad(self, vec1, vec2, shared, margin=1):
+        # print("ran")
+        if shared:
+            # print("ran1")
+            return (vec2 - vec1) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
+        
+        if (vec1 == vec2).all():
+            # print("ran2")
+            return np.random.randn(*vec1.shape)
+        
+        if margin > np.linalg.norm(np.array(vec1 - vec2), ord=2):
+            # print("ran3")
+            return (vec1 - vec2) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
+
+        # print("ran4")
+        return np.zeros_like(vec1)
+
+    def __call__(self, y, raw_predictions, sample_weight=None):
+        """Compute the contrastive loss
+
+        Parameters
+        ----------
+        y : ndarray of shape (n_samples, K) K is the number of leaf nodes in the random forrest classifier
+            True labels.
+
+        raw_predictions : ndarray of shape (n_samples, K)
+            The raw predictions (i.e. values from the tree leaves) of the
+            tree ensemble.
+
+        sample_weight : ndarray of shape (n_samples,), default=None
+            Sample weights.
+        """
+        total_loss = 0
+        classes = []
+
+        for class_n in range(np.max(y) + 1):
+            idx = np.where(y==class_n)
+            classes.append(raw_predictions[idx])
+
+        for idx1, class1 in enumerate(classes):
+            for idx2, class2 in enumerate(classes):
+                for vec1 in class1:
+                    for vec2 in class2:
+                        if idx2 > idx1:
+                            continue
+                        total_loss += self.single_point_loss(vec1, vec2, idx1 == idx2)
+    
+        return total_loss
+
+    def negative_gradient(self, y, raw_predictions, margin = 50, **kargs):
+        classes = []
+        classidxs = []
+        gradients = []
+
+        for class_n in range(np.max(y)+1):
+            idx = np.where(y==class_n)
+            classes.append(raw_predictions[idx])
+            classidxs.append(idx)
+
+        #compute the gradient for each vector in each class
+
+        for idx1, class1 in enumerate(classes):
+            sub_gradient_list = []
+            for vec1 in class1:
+                sub_gradient = np.zeros_like(vec1)
+                for idx2, class2 in enumerate(classes):
+                    for vec2 in class2:
+                        if (vec1 == vec2).all() and idx1 == idx2:
+                            continue
+                        sub_gradient = np.add(sub_gradient, self.single_point_grad(vec1, vec2, idx1 == idx2, margin))
+                
+                sub_gradient_list.append(sub_gradient)
+            gradients.append(sub_gradient_list)
+
+        gradients = np.array(gradients)
+        gradients = gradients.reshape(gradients.shape[0]*gradients.shape[1], gradients.shape[2])
+        classidxs = np.array(classidxs).flatten()
+
+
+
+        #okay, right now you have a list of gradients organized by class, you need to get it back into the initial order it was in
+        #thought: unravel both, the indexes should be the same, then sort gradients according to indexes
+        #can't unravel the gradients because you'll flatten the vectors. You have to unravel everything except that dimension
+
+        return np.array([gradients[i] for i in classidxs])
+
+    def update_terminal_regions(
+        self,
+        tree,
+        X,
+        y,
+        residual,
+        raw_predictions,
+        sample_weight,
+        sample_mask,
+        learning_rate=0.1,
+        k=0,
+    ):
+        """Least squares does not need to update terminal regions.
+
+        But it has to update the predictions.
+
+        Parameters
+        ----------
+        tree : tree.Tree
+            The tree object.
+        X : ndarray of shape (n_samples, n_features)
+            The data array.
+        y : ndarray of shape (n_samples,)
+            The target labels.
+        residual : ndarray of shape (n_samples,)
+            The residuals (usually the negative gradient).
+        raw_predictions : ndarray of shape (n_samples, K)
+            The raw predictions (i.e. values from the tree leaves) of the
+            tree ensemble at iteration ``i - 1``.
+        sample_weight : ndarray of shape (n,)
+            The weight of each sample.
+        sample_mask : ndarray of shape (n,)
+            The sample mask to be used.
+        learning_rate : float, default=0.1
+            Learning rate shrinks the contribution of each tree by
+             ``learning_rate``.
+        k : int, default=0
+            The index of the estimator being updated.
+        """
+        # update predictions
+        #check back on this
+        raw_predictions += learning_rate * tree.predict(X).reshape(4, 4)
+    
+    def _update_terminal_region(self, tree, terminal_regions, leaf, X, y, residual, raw_predictions, sample_weight):
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 LOSS_FUNCTIONS = {
     "squared_error": LeastSquaresError,
     "absolute_error": LeastAbsoluteError,
@@ -996,4 +1176,5 @@ LOSS_FUNCTIONS = {
     "deviance": None,  # for both, multinomial and binomial
     "log_loss": None,  # for both, multinomial and binomial
     "exponential": ExponentialLoss,
+    "contrastive": ContrastiveLossFunction,
 }
