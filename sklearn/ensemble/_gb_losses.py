@@ -1005,7 +1005,7 @@ class ExponentialLoss(ClassificationLossFunction):
 
 
 class ContrastiveLossFunction(RegressionLossFunction):
-    def __init__(self, latent_dim=4):
+    def __init__(self, latent_dim=12):
         super().__init__()
         self.latent_dim = latent_dim
 
@@ -1059,10 +1059,10 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
         for idx1, class1 in enumerate(classes):
             for idx2, class2 in enumerate(classes):
+                if idx2 > idx1:
+                    continue
                 for vec1 in class1:
                     for vec2 in class2:
-                        if idx2 > idx1:
-                            continue
                         total_loss += self.single_point_loss(vec1, vec2, idx1 == idx2)
     
         return total_loss
