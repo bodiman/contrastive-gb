@@ -301,6 +301,8 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
             self._loss = loss_class(self.n_classes_)
         elif self.loss in ("huber", "quantile"):
             self._loss = loss_class(self.alpha)
+        elif self.loss == "contrastive":
+            self._loss = loss_class(self.latent_dim)
         else:
             self._loss = loss_class()
 
