@@ -1093,6 +1093,8 @@ class ContrastiveLossFunction(RegressionLossFunction):
             gradients.append(sub_gradient_list)
 
         gradients = np.array(gradients)
+        print(gradients.shape)
+        print(gradients)
         gradients = gradients.reshape(gradients.shape[0]*gradients.shape[1], gradients.shape[2])
         classidxs = np.array(classidxs).flatten()
 
