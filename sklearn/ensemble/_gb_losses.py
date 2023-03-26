@@ -1089,7 +1089,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
                             continue
                         sub_gradient = np.add(sub_gradient, self.single_point_grad(vec1, vec2, idx1 == idx2, margin))
                 
-                sub_gradient_list.append(sub_gradient)
+                sub_gradient_list.append(sub_gradient.to_list())
             gradients.append(sub_gradient_list)
 
         gradients = np.array(gradients)
