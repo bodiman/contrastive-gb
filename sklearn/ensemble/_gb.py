@@ -1806,7 +1806,6 @@ class GradientBoostingRegressor(RegressorMixin, BaseGradientBoosting):
         ccp_alpha=0.0,
         latent_dim=12
     ):
-
         super().__init__(
             loss=loss,
             learning_rate=learning_rate,
@@ -1830,6 +1829,8 @@ class GradientBoostingRegressor(RegressorMixin, BaseGradientBoosting):
             tol=tol,
             ccp_alpha=ccp_alpha,
         )
+
+        self.latent_dim = latent_dim
 
     def _validate_y(self, y, sample_weight=None):
         if y.dtype.kind == "O":
