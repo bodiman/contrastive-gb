@@ -1053,7 +1053,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         total_loss = 0
         classes = []
 
-        for class_n in range(np.max(y) + 1):
+        for class_n in range(int(np.max(y) + 1)):
             idx = np.where(y==class_n)
             classes.append(raw_predictions[idx])
 
@@ -1072,7 +1072,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         classidxs = []
         gradients = []
 
-        for class_n in range(np.max(y)+1):
+        for class_n in range(int(np.max(y)+1)):
             idx = np.where(y==class_n)
             classes.append(raw_predictions[idx])
             classidxs.append(idx)
