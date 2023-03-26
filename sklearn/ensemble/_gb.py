@@ -697,7 +697,11 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         """Check input and compute raw predictions of the init estimator."""
         self._check_initialized()
         X = self.estimators_[0, 0]._validate_X_predict(X, check_input=True)
-        if self.init_ == "zero":
+        if self.init_ == "contrastive":
+            raw_predictions = np.zeros(
+                shape=(X.shape[0], self._loss.latent_dim), dtype=np.float64
+            )
+        elif self.init_ == "zero":
             raw_predictions = np.zeros(
                 shape=(X.shape[0], self._loss.K), dtype=np.float64
             )
