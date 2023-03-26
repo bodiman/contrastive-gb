@@ -703,12 +703,11 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
             raw_predictions = np.zeros(
                 shape=(X.shape[0], self._loss.latent_dim), dtype=np.float64
             )
-        if self.init_ == "zero":
+        elif self.init_ == "zero":
             raw_predictions = np.zeros(
                 shape=(X.shape[0], self._loss.K), dtype=np.float64
             )
         else:
-            print(self.init_)
             raw_predictions = self._loss.get_init_raw_predictions(X, self.init_).astype(
                 np.float64
             )
