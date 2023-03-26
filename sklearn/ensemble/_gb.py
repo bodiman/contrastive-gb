@@ -1804,6 +1804,7 @@ class GradientBoostingRegressor(RegressorMixin, BaseGradientBoosting):
         n_iter_no_change=None,
         tol=1e-4,
         ccp_alpha=0.0,
+        latent_dim=12
     ):
 
         super().__init__(
