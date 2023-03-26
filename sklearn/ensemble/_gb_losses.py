@@ -1075,7 +1075,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         for class_n in range(np.max(y)+1):
             idx = np.where(y==class_n)
             classes.append(raw_predictions[idx])
-            classidxs.append(idx)
+            classidxs.append(list(idx))
 
         #compute the gradient for each vector in each class
 
@@ -1092,9 +1092,10 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 sub_gradient_list.append(sub_gradient)
             gradients.append(sub_gradient_list)
 
+        gradients = sum(gradients, [])
         gradients = np.array(gradients)
-        gradients = gradients.reshape(gradients.shape[0]*gradients.shape[1], gradients.shape[2])
-        classidxs = np.array(classidxs).flatten()
+        classidxs = np.concatenate(sum(classidxs, []))
+        
 
 
 
@@ -1145,7 +1146,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         """
         # update predictions
         #check back on this
-        raw_predictions += learning_rate * tree.predict(X).reshape(4, 4)
+        raw_predictions += learning_rate * tree.predict(X).reshape(X.shape[0], self.latent_dim)
     
     def _update_terminal_region(self, tree, terminal_regions, leaf, X, y, residual, raw_predictions, sample_weight):
         pass
