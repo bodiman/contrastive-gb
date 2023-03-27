@@ -1020,17 +1020,13 @@ class ContrastiveLossFunction(RegressionLossFunction):
         return max(0, self.margin - np.linalg.norm(np.array(vec1 - vec2), ord=2))
     
     def single_point_grad(self, vec1, vec2, shared):
-        # print("ran")
         if shared:
-            print("ran1")
             return (vec2 - vec1) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
         
         if (vec1 == vec2).all():
-            print("ran2")
             return np.random.randn(*vec1.shape)
         
         if self.margin > np.linalg.norm(np.array(vec1 - vec2), ord=2):
-            print("ran3")
             return (vec1 - vec2) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
 
         print("ran4")
@@ -1062,8 +1058,10 @@ class ContrastiveLossFunction(RegressionLossFunction):
             for idx2, class2 in enumerate(classes):
                 if idx2 > idx1:
                     continue
-                for vec1 in class1:
-                    for vec2 in class2:
+                for idx3, vec1 in enumerate(class1):
+                    for idx4, vec2 in enumerate(class2):
+                        if idx2 == idx1:
+                            continue
                         total_loss += self.single_point_loss(vec1, vec2, idx1 == idx2)
     
         return total_loss
