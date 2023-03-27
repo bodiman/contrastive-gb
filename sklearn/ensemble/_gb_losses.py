@@ -1005,34 +1005,35 @@ class ExponentialLoss(ClassificationLossFunction):
 
 
 class ContrastiveLossFunction(RegressionLossFunction):
-    def __init__(self, latent_dim=12):
+    def __init__(self, latent_dim=12, margin_proportion=5):
         super().__init__()
         self.latent_dim = latent_dim
+        self.margin = margin_proportion * latent_dim**0.5
 
     def init_estimator(self):
         return "contrastive"
 
-    def single_point_loss(self, vec1, vec2, shared, margin=1):
+    def single_point_loss(self, vec1, vec2, shared):
         if shared:
             return np.linalg.norm(np.array(vec1 - vec2), ord=2)
         
-        return max(0, margin - np.linalg.norm(np.array(vec1 - vec2), ord=2))
+        return max(0, self.margin - np.linalg.norm(np.array(vec1 - vec2), ord=2))
     
-    def single_point_grad(self, vec1, vec2, shared, margin=1):
+    def single_point_grad(self, vec1, vec2, shared):
         # print("ran")
         if shared:
-            # print("ran1")
+            print("ran1")
             return (vec2 - vec1) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
         
         if (vec1 == vec2).all():
-            # print("ran2")
+            print("ran2")
             return np.random.randn(*vec1.shape)
         
-        if margin > np.linalg.norm(np.array(vec1 - vec2), ord=2):
-            # print("ran3")
+        if self.margin > np.linalg.norm(np.array(vec1 - vec2), ord=2):
+            print("ran3")
             return (vec1 - vec2) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
 
-        # print("ran4")
+        print("ran4")
         return np.zeros_like(vec1)
 
     def __call__(self, y, raw_predictions, sample_weight=None):
