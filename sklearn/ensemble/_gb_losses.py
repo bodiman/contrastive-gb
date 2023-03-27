@@ -1088,7 +1088,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
                     for vec2 in class2:
                         if (vec1 == vec2).all() and idx1 == idx2:
                             continue
-                        sub_gradient = np.add(sub_gradient, self.single_point_grad(vec1, vec2, idx1 == idx2, margin))
+                        sub_gradient = np.add(sub_gradient, self.single_point_grad(vec1, vec2, idx1 == idx2))
                 
                 sub_gradient_list.append(sub_gradient.tolist())
             gradients.append(sub_gradient_list)
