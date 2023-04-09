@@ -1081,15 +1081,15 @@ class ContrastiveLossFunction(RegressionLossFunction):
         print("raw_pred")
         print(raw_predictions.shape)
         print(raw_predictions)
-        y= y[p]
-        raw_predictions = raw_predictions[p]
-        print("---")
-        print("y")
-        print(y.shape)
-        print(y)
-        print("raw_pred")
-        print(raw_predictions.shape)
-        print(raw_predictions)
+        # y= y[p]
+        # raw_predictions = raw_predictions[p]
+        # print("---")
+        # print("y")
+        # print(y.shape)
+        # print(y)
+        # print("raw_pred")
+        # print(raw_predictions.shape)
+        # print(raw_predictions)
 
         batches = []
         classes = []
