@@ -1075,7 +1075,20 @@ class ContrastiveLossFunction(RegressionLossFunction):
         #batches is a list of tuples
 
         p = np.random.permutation(len(y))
+        print("y")
+        print(y.shape)
+        print(y)
+        print("raw_pred")
+        print(raw_predictions.shape)
+        print(raw_predictions)
         y, raw_predictions = y[p], raw_predictions[p]
+        print("---")
+        print("y")
+        print(y.shape)
+        print(y)
+        print("raw_pred")
+        print(raw_predictions.shape)
+        print(raw_predictions)
 
         batches = []
         classes = []
