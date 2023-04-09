@@ -13,6 +13,9 @@ from ..utils.stats import _weighted_percentile
 from ..dummy import DummyClassifier
 from ..dummy import DummyRegressor
 
+import math
+import random
+
 
 class LossFunction(metaclass=ABCMeta):
     """Abstract base class for various loss functions.
@@ -1005,10 +1008,11 @@ class ExponentialLoss(ClassificationLossFunction):
 
 
 class ContrastiveLossFunction(RegressionLossFunction):
-    def __init__(self, latent_dim=12, margin_proportion=5):
+    def __init__(self, latent_dim=12, margin_proportion=5, batch_size=12):
         super().__init__()
         self.latent_dim = latent_dim
         self.margin = margin_proportion * latent_dim**0.5
+        self.batch_size = batch_size
 
     def init_estimator(self):
         return "contrastive"
@@ -1029,7 +1033,6 @@ class ContrastiveLossFunction(RegressionLossFunction):
         if self.margin > np.linalg.norm(np.array(vec1 - vec2), ord=2):
             return (vec1 - vec2) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
 
-        print("ran4")
         return np.zeros_like(vec1)
 
     def __call__(self, y, raw_predictions, sample_weight=None):
@@ -1065,8 +1068,55 @@ class ContrastiveLossFunction(RegressionLossFunction):
                         total_loss += self.single_point_loss(vec1, vec2, idx1 == idx2)
     
         return total_loss
+    
+    def negative_gradient(self, y, raw_predictions, **kargs):
+        running_gradient = np.zeros_like(raw_predictions[0])
 
-    def negative_gradient(self, y, raw_predictions, margin = 50, **kargs):
+        #batches is a list of tuples
+
+        p = np.random.permutation(len(y))
+        y, raw_predictions = y[p], raw_predictions[p]
+
+        batches = []
+        classes = []
+        classidxs = []
+        batch_proportions = []
+
+        for class_n in range(int(np.max(y)+1)):
+            idx = np.where(y==class_n)
+            classes.append(raw_predictions[idx])
+            classidxs.append(list(idx))
+            batch_proportions.append(math.floor(len(raw_predictions[idx])/len(raw_predictions)*self.batch_size))
+
+        #while you can still take sufficient samples from each class
+        batching = True
+        while batching:
+            #sample raw_predictions without replacement for each class from classes
+            cvs = []
+            rps = []
+            for idx, (class_n, classidx_n) in enumerate(zip(classes, classidxs)):
+                if len(class_n) < batch_proportions[idx]:
+                    batching = False
+                    break
+
+                rp = class_n[:batch_proportions[idx]]
+                classes[idx] = classes[idx][batch_proportions[idx]:]
+                #sample y without replacement for each class from classidxs
+                cv = classidx_n[:batch_proportions[idx]]
+                classidxs[idx] = classidxs[idx][batch_proportions[idx]:]
+                #pack the values in a tuple and append them to batches
+                rps.append(rp)
+                cvs.append(cv)
+            
+            if batching:
+                batches.append((np.array(cvs), np.array(rps)))
+
+        for batch in batches:
+            running_gradient += self.negative_gradient(*batch)
+
+        return running_gradient
+
+    def negative_gradient_batch(self, y, raw_predictions, **kargs):
         classes = []
         classidxs = []
         gradients = []
@@ -1094,13 +1144,6 @@ class ContrastiveLossFunction(RegressionLossFunction):
         gradients = sum(gradients, [])
         gradients = np.array(gradients)
         classidxs = np.concatenate(sum(classidxs, []))
-        
-
-
-
-        #okay, right now you have a list of gradients organized by class, you need to get it back into the initial order it was in
-        #thought: unravel both, the indexes should be the same, then sort gradients according to indexes
-        #can't unravel the gradients because you'll flatten the vectors. You have to unravel everything except that dimension
 
         return np.array([gradients[i] for i in classidxs])
 
