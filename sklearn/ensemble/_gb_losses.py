@@ -1075,21 +1075,6 @@ class ContrastiveLossFunction(RegressionLossFunction):
         #batches is a list of tuples
 
         p = np.random.permutation(len(y))
-        # print("y")
-        # print(y.shape)
-        # print(y)
-        # print("raw_pred")
-        # print(raw_predictions.shape)
-        # print(raw_predictions)
-        # y= y[p]
-        # raw_predictions = raw_predictions[p]
-        # print("---")
-        # print("y")
-        # print(y.shape)
-        # print(y)
-        # print("raw_pred")
-        # print(raw_predictions.shape)
-        # print(raw_predictions)
 
         batches = []
         classes = []
@@ -1128,6 +1113,13 @@ class ContrastiveLossFunction(RegressionLossFunction):
         return running_gradient
 
     def negative_gradient_batch(self, y, raw_predictions, **kargs):
+        print("y")
+        print(y.shape)
+        print(y)
+        print("raw_predictions")
+        print(raw_predictions.shape)
+        print(raw_predictions)
+
         classes = []
         classidxs = []
         gradients = []
