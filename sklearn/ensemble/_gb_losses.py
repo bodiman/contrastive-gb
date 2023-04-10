@@ -1107,8 +1107,8 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 #sample y without replacement for each class from classidxs
                 cv = [idx for _ in range(self.batch_size)]
                 #pack the values in a tuple and append them to batches
-                rps.append(rp)
-                cvs.append(cv)
+                rps += rp
+                cvs += cv
             
             if batching:
                 batches.append((np.array(cvs), np.array(rps)))
