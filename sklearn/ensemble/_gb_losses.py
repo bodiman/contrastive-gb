@@ -1071,10 +1071,16 @@ class ContrastiveLossFunction(RegressionLossFunction):
     
     def negative_gradient(self, y, raw_predictions, **kargs):
         running_gradient = np.zeros_like(raw_predictions[0])
+        print("rp")
+        print(raw_predictions)
+        print("y")
+        print(y)
 
         #batches is a list of tuples
 
         p = np.random.permutation(len(y))
+
+        #randomize order of y and raw_predictions
 
         batches = []
         classes = []
@@ -1126,6 +1132,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
         for class_n in range(int(np.max(y)+1)):
             idx = np.where(y==class_n)
+            print(idx)
             classes.append(raw_predictions[idx])
             classidxs.append(list(idx))
 
