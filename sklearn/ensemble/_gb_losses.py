@@ -1093,13 +1093,11 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
         batches = []
         classes = []
-        classidxs = []
         batch_proportions = []
 
         for class_n in range(int(np.max(y)+1)):
             idx = np.where(y==class_n)
             classes.append(raw_predictions[idx])
-            classidxs.append(list(idx))
             batch_proportions.append(math.floor(len(raw_predictions[idx])/len(raw_predictions)*self.batch_size))
 
         #while you can still take sufficient samples from each class
@@ -1108,7 +1106,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
             #sample raw_predictions without replacement for each class from classes
             cvs = []
             rps = []
-            for idx, (class_n, classidx_n) in enumerate(zip(classes, classidxs)):
+            for idx, class_n in enumerate(classes):
                 if len(class_n) < batch_proportions[idx]:
                     batching = False
                     break
@@ -1116,8 +1114,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 rp = class_n[:batch_proportions[idx]]
                 classes[idx] = classes[idx][batch_proportions[idx]:]
                 #sample y without replacement for each class from classidxs
-                cv = classidx_n[:batch_proportions[idx]]
-                classidxs[idx] = classidxs[idx][batch_proportions[idx]:]
+                cv = [idx for _ in range(len(self.batch_size))]
                 #pack the values in a tuple and append them to batches
                 rps.append(rp)
                 cvs.append(cv)
