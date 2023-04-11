@@ -1144,6 +1144,8 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
         #compute the gradient for each vector in each class
 
+        print("raw predictions")
+        print(raw_predictions)
         print("classes")
         print(classes)
 
