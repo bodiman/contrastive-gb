@@ -1019,17 +1019,17 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
     def single_point_loss(self, vec1, vec2, shared):
         if shared:
-            try:
                 return np.linalg.norm(np.array(vec1 - vec2), ord=2)
-            except:
-                print(vec1, vec2)
-                raise "found error"
         
         return max(0, self.margin - np.linalg.norm(np.array(vec1 - vec2), ord=2))
     
     def single_point_grad(self, vec1, vec2, shared):
         if shared:
-            return (vec2 - vec1) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
+            try:
+                return (vec2 - vec1) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
+            except:
+                print(vec2, vec1, vec1-vec2)
+                raise "error found"
         
         if (vec1 == vec2).all():
             return np.random.randn(*vec1.shape)
