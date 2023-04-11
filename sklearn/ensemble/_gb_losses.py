@@ -1071,10 +1071,6 @@ class ContrastiveLossFunction(RegressionLossFunction):
     
     def negative_gradient(self, y, raw_predictions, **kargs):
         running_gradient = np.zeros_like(raw_predictions[0])
-        print("rp")
-        print(raw_predictions)
-        print("y")
-        print(y)
 
         #batches is a list of tuples
 
@@ -1109,6 +1105,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 #pack the values in a tuple and append them to batches
                 rps = []
                 for i in rp:
+                    print(rps, i)
                     rps += i
                 cvs += cv
             
