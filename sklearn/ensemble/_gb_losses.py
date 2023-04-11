@@ -1089,7 +1089,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         for class_n in range(int(np.max(y)+1)):
             idx = np.where(y==class_n)
             classes.append(raw_predictions[idx])
-            batch_proportions.append(math.floor(len(raw_predictions[idx])/len(raw_predictions)*self.batch_size))
+            batch_proportions.append(len(raw_predictions[idx])//len(raw_predictions)*self.batch_size)
 
         print("Batch proportions:", batch_proportions)
 
@@ -1121,6 +1121,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         for batch in batches:
             print("batch0 shape")
             print(batch[0].shape, "*", len(batches))
+            print(batch)
             running_gradient.append(self.negative_gradient_batch(*batch))
 
         for i in range(len(raw_predictions) - len(batches)):
@@ -1147,10 +1148,10 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
         #compute the gradient for each vector in each class
 
-        print("raw predictions")
-        print(raw_predictions)
-        print("classes")
-        print(classes)
+        # print("raw predictions")
+        # print(raw_predictions)
+        # print("classes")
+        # print(classes)
 
         for idx1, class1 in enumerate(classes):
             sub_gradient_list = []
