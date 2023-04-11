@@ -1117,7 +1117,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 batches.append((np.array(cvs), np.array(rps)))
 
         for batch in batches:
-            print(batch.shape)
+            print(batch[0].shape)
             running_gradient.append(self.negative_gradient_batch(*batch))
 
         for i in range(len(raw_predictions) - len(batches)):
