@@ -1091,7 +1091,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
             classes.append(raw_predictions[idx])
             batch_proportions.append(math.floor(len(raw_predictions[idx])/len(raw_predictions)*self.batch_size))
 
-        print(batch_proportions)
+        print("Batch proportions:", batch_proportions)
 
         #while you can still take sufficient samples from each class
         batching = True
@@ -1120,7 +1120,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
         for batch in batches:
             print("batch0 shape")
-            print(batch[0].shape)
+            print(batch[0].shape, "*", len(batches))
             running_gradient.append(self.negative_gradient_batch(*batch))
 
         for i in range(len(raw_predictions) - len(batches)):
