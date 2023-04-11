@@ -1143,6 +1143,9 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
         #compute the gradient for each vector in each class
 
+        print("classes")
+        print(classes)
+
         for idx1, class1 in enumerate(classes):
             sub_gradient_list = []
             for vec1 in class1:
