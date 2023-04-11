@@ -1107,7 +1107,9 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 #sample y without replacement for each class from classidxs
                 cv = [idx for _ in range(self.batch_size)]
                 #pack the values in a tuple and append them to batches
-                rps += rp
+                rps = []
+                for i in rp:
+                    rps += i
                 cvs += cv
             
             if batching:
