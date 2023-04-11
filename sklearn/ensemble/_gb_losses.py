@@ -1089,7 +1089,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         for class_n in range(int(np.max(y)+1)):
             idx = np.where(y==class_n)
             classes.append(raw_predictions[idx])
-            batch_proportions.append(len(raw_predictions[idx])//len(raw_predictions)*self.batch_size)
+            batch_proportions.append(int(len(raw_predictions[idx])/len(raw_predictions)*self.batch_size))
 
         print("Batch proportions:", batch_proportions)
 
