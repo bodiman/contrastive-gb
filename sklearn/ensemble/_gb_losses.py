@@ -1105,7 +1105,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 #pack the values in a tuple and append them to batches
                 rps = []
                 for i in rp:
-                    print(rps, i, type(rps), type(i))
+                    # print(rps, i, type(rps), type(i))
                     rps += list(i)
                 cvs += cv
             
@@ -1115,15 +1115,17 @@ class ContrastiveLossFunction(RegressionLossFunction):
         for batch in batches:
             running_gradient += self.negative_gradient_batch(*batch)
 
+        print("final rg")
+        print(running_gradient)
         return running_gradient
 
     def negative_gradient_batch(self, y, raw_predictions, **kargs):
-        print("y")
-        print(y.shape)
-        print(y)
-        print("raw_predictions")
-        print(raw_predictions.shape)
-        print(raw_predictions)
+        # print("y")
+        # print(y.shape)
+        # print(y)
+        # print("raw_predictions")
+        # print(raw_predictions.shape)
+        # print(raw_predictions)
 
         classes = []
         classidxs = []
@@ -1131,7 +1133,6 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
         for class_n in range(int(np.max(y)+1)):
             idx = np.where(y==class_n)
-            print(idx)
             classes.append(raw_predictions[idx])
             classidxs.append(list(idx))
 
@@ -1153,6 +1154,8 @@ class ContrastiveLossFunction(RegressionLossFunction):
         gradients = sum(gradients, [])
         gradients = np.array(gradients)
         classidxs = np.concatenate(sum(classidxs, []))
+
+        print(np.array([gradients[i] for i in classidxs]))
 
         return np.array([gradients[i] for i in classidxs])
 
