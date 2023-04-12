@@ -1107,9 +1107,6 @@ class ContrastiveLossFunction(RegressionLossFunction):
                     break
 
                 rp = class_n[:batch_proportions[idx]]
-                print("rp")
-                print(rp)
-                print("classidxshape", classes[idx].shape)
                 classes[idx] = classes[idx][batch_proportions[idx]:]
                 #sample y without replacement for each class from classidxs
                 cv = [idx for _ in range(self.batch_size)]
@@ -1118,8 +1115,10 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 for i in rp:
                     # print(rps, i, type(rps), type(i))
                     rps += list(i)
-                print(len(rps))
                 cvs += cv
+
+            print("rps shape")
+            print(np.array(rps).shape)
             
             if batching:
                 batches.append((np.array(cvs), np.array(rps)))
@@ -1128,7 +1127,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         for batch in batches:
             print("batch0 shape")
             print(batch[0].shape, "*", len(batches))
-            print(batch)
+            # print(batch)
             running_gradient.append(self.negative_gradient_batch(*batch))
 
         for i in range(len(raw_predictions) - len(batches)):
