@@ -1105,18 +1105,22 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 if len(class_n) < batch_proportions[idx]:
                     batching = False
                     break
+                
+                print("batch_portions:", batch_proportions[idx])
 
                 rp = class_n[:batch_proportions[idx]]
                 print("rplen:", len(rp))
                 classes[idx] = classes[idx][batch_proportions[idx]:]
                 #sample y without replacement for each class from classidxs
-                print("batch_portions:", batch_proportions[idx])
+                
                 cv = [idx for _ in range(batch_proportions[idx])]
+                print("cvlen:", len(cv))
                 #pack the values in a tuple and append them to batches
                 rps = []
                 for i in rp:
                     # print(rps, i, type(rps), type(i))
                     rps += list(i)
+                print("rpslen:", len(rps))
                 cvs += cv
 
             print("rps shape")
