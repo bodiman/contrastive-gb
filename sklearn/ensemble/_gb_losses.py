@@ -1118,15 +1118,13 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 cvs += cv
 
             print("rps shape")
-            print(np.array(rps).shape)
+            print(np.array(rps).reshape(len(rps)/self.batch_size, self.batch_size).shape)
             
             if batching:
-                batches.append((np.array(cvs), np.array(rps)))
+                batches.append((np.array(cvs), np.array(rps).reshape(len(rps)/self.batch_size, self.batch_size)))
 
         print("Batch length:", len(batches))
         for batch in batches:
-            print("batch0 shape")
-            print(batch[0].shape, "*", len(batches))
             # print(batch)
             running_gradient.append(self.negative_gradient_batch(*batch))
 
