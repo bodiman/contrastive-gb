@@ -1134,14 +1134,13 @@ class ContrastiveLossFunction(RegressionLossFunction):
             # print(batch)
             running_gradient.append(self.negative_gradient_batch(*batch))
 
-        for i in range(len(raw_predictions) - len(batches)):
-            running_gradient.append(np.zeros(self.latent_dim))
+        running_gradient.append(np.zeros(len(raw_predictions) - len(batches), self.latent_dim))
 
         print("Negative Gradient:")
-        print(np.array(running_gradient).shape)
-        print(np.array(running_gradient))
+        print(np.concatenate(running_gradient).shape)
+        print(np.concatenate(running_gradient))
 
-        return np.array(running_gradient)
+        return np.concatenate(running_gradient)
 
     def negative_gradient_batch(self, y, raw_predictions, **kargs):
         # print("y")
