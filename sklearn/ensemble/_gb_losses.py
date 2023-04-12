@@ -1119,6 +1119,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
 
             print("rps shape")
             print(np.array(rps).reshape(len(rps)//self.batch_size, self.batch_size).shape)
+            print("cvs shape:", np.array(cvs).shape)
             
             if batching:
                 batches.append((np.array(cvs), np.array(rps).reshape(len(rps)//self.batch_size, self.batch_size)))
