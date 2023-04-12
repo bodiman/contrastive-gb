@@ -1116,7 +1116,6 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 cv = [idx for _ in range(batch_proportions[idx])]
                 print("cvlen:", len(cv))
                 #pack the values in a tuple and append them to batches
-                rps = []
                 for i in rp:
                     # print(rps, i, type(rps), type(i))
                     rps += list(i)
