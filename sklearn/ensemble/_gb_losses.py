@@ -1107,6 +1107,8 @@ class ContrastiveLossFunction(RegressionLossFunction):
                     break
 
                 rp = class_n[:batch_proportions[idx]]
+                print("rp")
+                print(rp)
                 print("classidxshape", classes[idx].shape)
                 classes[idx] = classes[idx][batch_proportions[idx]:]
                 #sample y without replacement for each class from classidxs
@@ -1116,6 +1118,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
                 for i in rp:
                     # print(rps, i, type(rps), type(i))
                     rps += list(i)
+                print(len(rps))
                 cvs += cv
             
             if batching:
