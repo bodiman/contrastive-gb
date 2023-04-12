@@ -1120,7 +1120,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
                     # print(rps, i, type(rps), type(i))
                     rps += list(i)
                 print("rpslen:", len(rps))
-                cvs += cv
+                cvs += list(cv)
 
             print("rps shape")
             print(np.array(rps).reshape(len(rps)//self.batch_size, self.batch_size).shape)
