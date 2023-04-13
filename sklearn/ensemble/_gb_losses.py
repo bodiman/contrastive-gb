@@ -1091,9 +1091,9 @@ class ContrastiveLossFunction(RegressionLossFunction):
             classes.append(raw_predictions[idx])
             batch_proportions.append(math.ceil(len(raw_predictions[idx])/len(raw_predictions)*self.batch_size))
 
-        print("Batch proportions:", batch_proportions)
-        print("classes")
-        print(classes)
+        # print("Batch proportions:", batch_proportions)
+        # print("classes")
+        # print(classes)
 
         #while you can still take sufficient samples from each class
         batching = True
@@ -1106,30 +1106,30 @@ class ContrastiveLossFunction(RegressionLossFunction):
                     batching = False
                     break
                 
-                print("batch_portions:", batch_proportions[idx])
+                # print("batch_portions:", batch_proportions[idx])
 
                 rp = class_n[:batch_proportions[idx]]
-                print("rplen:", len(rp))
+                # print("rplen:", len(rp))
                 classes[idx] = classes[idx][batch_proportions[idx]:]
                 #sample y without replacement for each class from classidxs
                 
                 cv = [idx for _ in range(batch_proportions[idx])]
-                print("cvlen:", len(cv))
+                # print("cvlen:", len(cv))
                 #pack the values in a tuple and append them to batches
                 for i in rp:
                     # print(rps, i, type(rps), type(i))
                     rps += list(i)
-                print("rpslen:", len(rps))
+                # print("rpslen:", len(rps))
                 cvs += list(cv)
 
-            print("rps shape")
-            print(np.array(rps).reshape(len(rps)//self.batch_size, self.batch_size).shape)
-            print("cvs shape:", np.array(cvs).shape)
+            # print("rps shape")
+            # print(np.array(rps).reshape(len(rps)//self.batch_size, self.batch_size).shape)
+            # print("cvs shape:", np.array(cvs).shape)
             
             if batching:
                 batches.append((np.array(cvs), np.array(rps).reshape(len(rps)//self.batch_size, self.batch_size)))
 
-        print("Batch length:", len(batches))
+        # print("Batch length:", len(batches))
         for batch in batches:
             # print(batch)
             running_gradient.append(self.negative_gradient_batch(*batch))
@@ -1137,8 +1137,8 @@ class ContrastiveLossFunction(RegressionLossFunction):
         running_gradient.append(np.zeros(shape=(len(raw_predictions) - len(batches), self.latent_dim)))
 
         print("Negative Gradient:")
-        print(np.concatenate(running_gradient).shape)
-        print(np.concatenate(running_gradient))
+        print(running_gradient)
+        # print(np.concatenate(running_gradient))
 
         return np.concatenate(running_gradient)
 
