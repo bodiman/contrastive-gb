@@ -1138,8 +1138,9 @@ class ContrastiveLossFunction(RegressionLossFunction):
         running_gradient.append(np.zeros(shape=(len(raw_predictions) - len(batches), self.latent_dim)))
 
         print("Negative Gradient:")
-        print(running_gradient)
-        # print(np.concatenate(running_gradient))
+        # print(running_gradient)
+        print(np.concatenate(running_gradient).shape)
+        print(np.concatenate(running_gradient))
 
         return np.concatenate(running_gradient)
 
