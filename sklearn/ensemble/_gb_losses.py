@@ -1075,6 +1075,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
     
     def negative_gradient(self, y, raw_predictions, **kargs):
         print("len y:", len(y))
+        print("len rp:", len(raw_predictions))
         running_gradient = []
 
         #batches is a list of tuples
@@ -1141,6 +1142,8 @@ class ContrastiveLossFunction(RegressionLossFunction):
         # print(running_gradient)
         print(np.concatenate(running_gradient).shape)
         print(np.concatenate(running_gradient))
+
+        print(len(raw_predictions))
 
         return np.concatenate(running_gradient)
 
