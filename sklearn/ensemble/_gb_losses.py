@@ -1074,13 +1074,18 @@ class ContrastiveLossFunction(RegressionLossFunction):
         return total_loss
     
     def negative_gradient(self, y, raw_predictions, **kargs):
-        print("len y:", len(y))
-        print("len rp:", len(raw_predictions))
+        # print("len y:", len(y))
+        # print("len rp:", len(raw_predictions))
         running_gradient = []
 
         #batches is a list of tuples
 
         p = np.random.permutation(len(y))
+        s = np.empty_like(p)
+        s[p] = np.arange(p.size)
+
+        raw_predictions = raw_predictions[p]
+        y = y[p]
 
         #randomize order of y and raw_predictions
 
@@ -1137,22 +1142,22 @@ class ContrastiveLossFunction(RegressionLossFunction):
             running_gradient.append(self.negative_gradient_batch(*batch))
         
 
-        print("Values:")
-        print(len(raw_predictions))
-        print(len(running_gradient))
-        print(len(raw_predictions) - len(running_gradient))
-        print(len(np.zeros(shape=(len(raw_predictions) - len(running_gradient), self.latent_dim))))
+        # print("Values:")
+        # print(len(raw_predictions))
+        # print(len(running_gradient))
+        # print(len(raw_predictions) - len(running_gradient))
+        # print(len(np.zeros(shape=(len(raw_predictions) - len(running_gradient), self.latent_dim))))
 
         running_gradient.append(np.zeros(shape=(len(raw_predictions) - len(np.concatenate(running_gradient)), self.latent_dim)))
 
-        print("Negative Gradient:")
-        # print(running_gradient)
-        print(np.concatenate(running_gradient).shape)
-        print(np.concatenate(running_gradient))
+        # print("Negative Gradient:")
+        # # print(running_gradient)
+        # print(np.concatenate(running_gradient).shape)
+        # print(np.concatenate(running_gradient))
 
-        print(len(raw_predictions))
+        # print(len(raw_predictions))
 
-        return np.concatenate(running_gradient)
+        return np.concatenate(running_gradient)[s]
 
     def negative_gradient_batch(self, y, raw_predictions, **kargs):
         # print("y")
