@@ -302,7 +302,7 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         elif self.loss in ("huber", "quantile"):
             self._loss = loss_class(self.alpha)
         elif self.loss == "contrastive":
-            self._loss = loss_class(self.latent_dim, self.margin_proportion)
+            self._loss = loss_class(self.latent_dim, self.margin_proportion, self.batch_size)
         else:
             self._loss = loss_class()
 
@@ -1805,7 +1805,8 @@ class GradientBoostingRegressor(RegressorMixin, BaseGradientBoosting):
         tol=1e-4,
         ccp_alpha=0.0,
         latent_dim=12,
-        margin_proportion=5
+        margin_proportion=5,
+        batch_size=12
     ):
         super().__init__(
             loss=loss,
@@ -1833,6 +1834,7 @@ class GradientBoostingRegressor(RegressorMixin, BaseGradientBoosting):
 
         self.latent_dim = latent_dim
         self.margin_proportion = margin_proportion
+        self.batch_size = batch_size
 
     def _validate_y(self, y, sample_weight=None):
         if y.dtype.kind == "O":
