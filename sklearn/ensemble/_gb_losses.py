@@ -1079,10 +1079,11 @@ class ContrastiveLossFunction(RegressionLossFunction):
         return np.array([[1] + [0 for _ in range(self.dim - 1)] if i == 0 else [0 for _ in range(self.dim)] for i in y])
     
     def negative_gradient(self, y, raw_predictions, **kargs):
-        # if self.initializing:
-        #     self.initializing = False
-        #     synthetic_labels = self.generate_synthetic_labels(y)
-        #     return synthetic_labels - raw_predictions
+        if self.initializing:
+            self.initializing = False
+            synthetic_labels = self.generate_synthetic_labels(y)
+            print((synthetic_labels - raw_predictions).shape)
+            return synthetic_labels - raw_predictions
             # negative gradient function: 2(label - prediction)
 
         # print("len y:", len(y))
