@@ -1076,7 +1076,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
     
     def generate_synthetic_labels(self, y):
         #need a more general solution
-        return np.array([[1] + [0 for _ in range(self.dim - 1)] if i == 0 else [0 for _ in range(self.dim)] for i in y])
+        return np.array([[1] + [0 for _ in range(self.latent_dim - 1)] if i == 0 else [0 for _ in range(self.latent_dim)] for i in y])
     
     def negative_gradient(self, y, raw_predictions, **kargs):
         if self.initializing:
