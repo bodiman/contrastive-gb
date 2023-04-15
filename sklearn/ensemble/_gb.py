@@ -302,6 +302,7 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         elif self.loss in ("huber", "quantile"):
             self._loss = loss_class(self.alpha)
         elif self.loss == "contrastive":
+            print("loss was initialized")
             self._loss = loss_class(self.latent_dim, self.margin_proportion, self.batch_size)
         else:
             self._loss = loss_class()

@@ -1082,7 +1082,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         if self.initializing:
             self.initializing = False
             synthetic_labels = self.generate_synthetic_labels(y)
-            print((synthetic_labels - raw_predictions).shape)
+            # print((synthetic_labels - raw_predictions).shape)
             return synthetic_labels - raw_predictions
             # negative gradient function: 2(label - prediction)
 
