@@ -1013,6 +1013,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         self.latent_dim = latent_dim
         self.margin = margin_proportion * latent_dim**0.5
         self.batch_size = batch_size
+        self.initializing = True
 
     def init_estimator(self):
         return "contrastive"
@@ -1073,7 +1074,17 @@ class ContrastiveLossFunction(RegressionLossFunction):
     
         return total_loss
     
+    def generate_synthetic_labels(self, y):
+        #need a more general solution
+        return np.array([[1] + [0 for _ in range(self.dim - 1)] if i == 0 else [0 for _ in range(self.dim)] for i in y])
+    
     def negative_gradient(self, y, raw_predictions, **kargs):
+        if self.initializing:
+            self.initializing = False
+            synthetic_labels = self.generate_synthetic_labels(y)
+            return synthetic_labels - raw_predictions
+            # negative gradient function: 2(label - prediction)
+
         # print("len y:", len(y))
         # print("len rp:", len(raw_predictions))
         running_gradient = []
@@ -1156,6 +1167,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         # print(np.concatenate(running_gradient))
 
         # print(len(raw_predictions))
+        print(np.concatenate(running_gradient).shape)
 
         return np.concatenate(running_gradient)[s]
 
