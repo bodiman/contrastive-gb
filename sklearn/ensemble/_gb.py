@@ -395,6 +395,7 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         check_is_fitted(self)
 
     def fit(self, X, y, sample_weight=None, monitor=None):
+        print("fit is called")
         """Fit the gradient boosting model.
 
         Parameters
