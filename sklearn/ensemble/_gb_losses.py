@@ -1014,6 +1014,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         self.margin = margin_proportion * latent_dim**0.5
         self.batch_size = batch_size
         self.initializing = labeled_initialization
+        print(self.initializing)
 
     def init_estimator(self):
         return "contrastive"
