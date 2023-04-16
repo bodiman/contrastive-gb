@@ -1165,7 +1165,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         # print(np.concatenate(running_gradient))
 
         # print(len(raw_predictions))
-        print(np.concatenate(running_gradient).shape)
+        # print(np.concatenate(running_gradient).shape)
 
         return np.concatenate(running_gradient)[s]
 
