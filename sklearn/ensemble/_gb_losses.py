@@ -1008,12 +1008,12 @@ class ExponentialLoss(ClassificationLossFunction):
 
 
 class ContrastiveLossFunction(RegressionLossFunction):
-    def __init__(self, latent_dim=12, margin_proportion=5, batch_size=12):
+    def __init__(self, latent_dim=12, margin_proportion=5, batch_size=12, labeled_initialization = True):
         super().__init__()
         self.latent_dim = latent_dim
         self.margin = margin_proportion * latent_dim**0.5
         self.batch_size = batch_size
-        self.initializing = True
+        self.initializing = labeled_initialization
 
     def init_estimator(self):
         return "contrastive"
@@ -1026,11 +1026,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
     
     def single_point_grad(self, vec1, vec2, shared):
         if shared:
-            try:
-                return (vec2 - vec1) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
-            except:
-                print(vec2, vec1, vec1-vec2)
-                raise "error found"
+            return (vec2 - vec1) / np.linalg.norm(np.array(vec1 - vec2), ord=2)
         
         if (vec1 == vec2).all():
             return np.random.randn(*vec1.shape)
@@ -1082,7 +1078,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
         if self.initializing:
             self.initializing = False
             synthetic_labels = self.generate_synthetic_labels(y)
-            # print((synthetic_labels - raw_predictions).shape)
+            print((synthetic_labels - raw_predictions).shape)
             return synthetic_labels - raw_predictions
             # negative gradient function: 2(label - prediction)
 

@@ -275,7 +275,6 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         return raw_predictions
 
     def _check_params(self):
-        print("function was called")
         # TODO(1.3): Remove
         if self.loss == "deviance":
             warnings.warn(
@@ -303,8 +302,8 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         elif self.loss in ("huber", "quantile"):
             self._loss = loss_class(self.alpha)
         elif self.loss == "contrastive":
-            print("loss function was assigned")
-            self._loss = loss_class(self.latent_dim, self.margin_proportion, self.batch_size)
+            self._loss = loss_class(self.latent_dim, self.margin_proportion, self.batch_size, self.labeled_initialization)
+            self.labeled_reinitialization = False
         else:
             self._loss = loss_class()
 
@@ -396,7 +395,6 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         check_is_fitted(self)
 
     def fit(self, X, y, sample_weight=None, monitor=None):
-        print("fit is called")
         """Fit the gradient boosting model.
 
         Parameters
@@ -1809,7 +1807,8 @@ class GradientBoostingRegressor(RegressorMixin, BaseGradientBoosting):
         ccp_alpha=0.0,
         latent_dim=12,
         margin_proportion=5,
-        batch_size=12
+        batch_size=12,
+        labeled_initialization = False
     ):
         super().__init__(
             loss=loss,
@@ -1838,6 +1837,7 @@ class GradientBoostingRegressor(RegressorMixin, BaseGradientBoosting):
         self.latent_dim = latent_dim
         self.margin_proportion = margin_proportion
         self.batch_size = batch_size
+        self.labeled_initialization = labeled_initialization
 
     def _validate_y(self, y, sample_weight=None):
         if y.dtype.kind == "O":
