@@ -303,7 +303,7 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
             self._loss = loss_class(self.alpha)
         elif self.loss == "contrastive":
             self._loss = loss_class(self.latent_dim, self.margin_proportion, self.batch_size, self.labeled_initialization)
-            self.labeled_reinitialization = False
+            self.labeled_initialization = False
         else:
             self._loss = loss_class()
 
