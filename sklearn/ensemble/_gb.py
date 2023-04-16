@@ -1808,7 +1808,7 @@ class GradientBoostingRegressor(RegressorMixin, BaseGradientBoosting):
         latent_dim=12,
         margin_proportion=5,
         batch_size=12,
-        labeled_initialization = False
+        labeled_initialization = True
     ):
         super().__init__(
             loss=loss,
