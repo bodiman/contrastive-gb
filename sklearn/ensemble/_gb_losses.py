@@ -1168,12 +1168,25 @@ class ContrastiveLossFunction(RegressionLossFunction):
         return np.concatenate(running_gradient)[s]
 
     def negative_gradient_batch(self, y, raw_predictions, **kargs):
-        # print("y")
-        # print(y.shape)
-        # print(y)
-        # print("raw_predictions")
-        # print(raw_predictions.shape)
-        # print(raw_predictions)
+        """
+        Implementation 1
+        Notes: 
+        This implementation is logically equivalent to the current implementation, but allows the single point gradients to be computed in parrallel
+
+        1. Get the classes 
+        2. For each class containing n vectors
+            a. make a numpy array, class1, containing all the vectors in the class | dim: (n, L)
+            b. for each other class 
+            I. for each vector
+                1. Create a numpy array, vec, of that vector repeating | dim: (n, L)
+                2. Compute grads = class1 - vec
+                3. Sum grads along the vector dimension, getting something in the shape of dim (L)
+                4. Append grads to the gradient list
+
+        3. Concatenate the gradient list
+        4. Sort gradients accoording to indexes and return gradients
+
+        """
 
         classes = []
         classidxs = []
@@ -1183,27 +1196,30 @@ class ContrastiveLossFunction(RegressionLossFunction):
             idx = np.where(y==class_n)
             classes.append(raw_predictions[idx])
             classidxs.append(list(idx))
-
-        #compute the gradient for each vector in each class
-
-        # print("raw predictions")
-        # print(raw_predictions)
-        # print("classes")
-        # print(classes)
+        
 
         for idx1, class1 in enumerate(classes):
             sub_gradient_list = []
             for vec1 in class1:
                 sub_gradient = np.zeros_like(vec1)
                 for idx2, class2 in enumerate(classes):
-                    for vec2 in class2:
-                        if (vec1 == vec2).all() and idx1 == idx2:
-                            continue
-                        sub_gradient = np.add(sub_gradient, self.single_point_grad(vec1, vec2, idx1 == idx2))
-                
+                    neg_grad = class2 - np.tile(vec1, class2.shape[0]).reshape(class2.shape)
+                    norms = np.sqrt(np.einsum('...i,...i', neg_grad, neg_grad)) #this magically takes the norms
+                    norms[norms == 0] = 1
+                    neg_grad = np.divide(neg_grad, norms[:,None])
+                    for i in range(len(norms)):
+                        if norms[i] >= 100:
+                            neg_grad[i] *= 0
+                        
+                    neg_grad = np.nan_to_num(neg_grad.sum(axis=0), nan=0)
+
+                    if idx1 != idx2:
+                        neg_grad *= -1
+
+                    sub_gradient = np.add(sub_gradient, (neg_grad))
                 sub_gradient_list.append(sub_gradient.tolist())
             gradients.append(sub_gradient_list)
-
+                
         gradients = sum(gradients, [])
         gradients = np.array(gradients)
         classidxs = np.concatenate(sum(classidxs, []))
