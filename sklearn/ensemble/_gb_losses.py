@@ -1051,24 +1051,24 @@ class ContrastiveLossFunction(RegressionLossFunction):
         sample_weight : ndarray of shape (n_samples,), default=None
             Sample weights.
         """
-        total_loss = 0
-        classes = []
+        # total_loss = 0
+        # classes = []
 
-        for class_n in range(int(np.max(y) + 1)):
-            idx = np.where(y==class_n)
-            classes.append(raw_predictions[idx])
+        # for class_n in range(int(np.max(y) + 1)):
+        #     idx = np.where(y==class_n)
+        #     classes.append(raw_predictions[idx])
 
-        for idx1, class1 in enumerate(classes):
-            for idx2, class2 in enumerate(classes):
-                if idx2 > idx1:
-                    continue
-                for idx3, vec1 in enumerate(class1):
-                    for idx4, vec2 in enumerate(class2):
-                        if idx2 == idx1:
-                            continue
-                        total_loss += self.single_point_loss(vec1, vec2, idx1 == idx2)
+        # for idx1, class1 in enumerate(classes):
+        #     for idx2, class2 in enumerate(classes):
+        #         if idx2 > idx1:
+        #             continue
+        #         for idx3, vec1 in enumerate(class1):
+        #             for idx4, vec2 in enumerate(class2):
+        #                 if idx2 == idx1:
+        #                     continue
+        #                 total_loss += self.single_point_loss(vec1, vec2, idx1 == idx2)
     
-        return total_loss
+        return 0 #total_loss
     
     def generate_synthetic_labels(self, y):
         #need a more general solution
