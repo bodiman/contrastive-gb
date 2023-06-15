@@ -1208,7 +1208,7 @@ class ContrastiveLossFunction(RegressionLossFunction):
                     norms[norms == 0] = 1
                     neg_grad = np.divide(neg_grad, norms[:,None])
                     for i in range(len(norms)):
-                        if norms[i] >= 100:
+                        if norms[i] >= self.margin:
                             neg_grad[i] *= 0
                         
                     neg_grad = np.nan_to_num(neg_grad.sum(axis=0), nan=0)
