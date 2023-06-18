@@ -175,9 +175,7 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
         n_iter_no_change=None,
         tol=1e-4,
     ):
-        print("n_estimators", n_estimators)
         self.n_estimators = n_estimators
-        print("self.n_estimators", self.n_estimators)
         self.learning_rate = learning_rate
         self.loss = loss
         self.criterion = criterion
@@ -538,7 +536,6 @@ class BaseGradientBoosting(BaseEnsemble, metaclass=ABCMeta):
             # add more estimators to fitted model
             # invariant: warm_start = True
             if self.n_estimators < self.estimators_.shape[0]: #Ignore, just an assertion
-                print("self.n_estimators", self.n_estimators)
                 raise ValueError(
                     "n_estimators=%d must be larger or equal to "
                     "estimators_.shape[0]=%d when "
